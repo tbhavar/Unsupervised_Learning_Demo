@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unsupervised Learning: Client Segmentation for CAs (Final)</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #f0f8ff 0%, #e6f2ff 100%);
+            color: #333;
+            line-height: 1.6;
+            text-align: center;
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #34495e;
+            font-size: 1.8em;
+            margin-top: 30px;
+            border-bottom: 2px solid #a0c4ff;
+            display: inline-block;
+            padding-bottom: 5px;
+        }
+        h3 {
+            color: #1e88e5;
+            margin-top: 0;
+            font-size: 1.4em;
+        }
+        p {
+            max-width: 800px;
+            margin: 15px auto;
+            font-size: 1.1em;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            padding: 30px;
+            margin: 30px auto;
+            max-width: 900px;
+            text-align: left;
+        }
+        .explanation-card {
+            background-color: #f7f9fc;
+            border-left: 5px solid #64b5f6;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        .visualization-area {
+            text-align: center;
+            margin-top: 40px;
+        }
+        svg {
+            background-color: #fcfdff;
+            border: 1px solid #dcdcdc;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            cursor: crosshair;
+        }
+        .controls {
+            margin-top: 20px;
+            text-align: center;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            margin: 5px;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        button#resetBtn {
+            background-color: #f44336;
+        }
+        button#resetBtn:hover {
+            background-color: #da190b;
+        }
+        .axis path, .axis line {
+            fill: none;
+            stroke: #ccc;
+            shape-rendering: crispEdges;
+        }
+        .axis text {
+            font-size: 0.8em;
+            fill: #666;
+        }
+        .dot {
+            transition: fill 0.5s ease, r 0.3s ease;
+        }
+        .dot:hover {
+            r: 8;
+        }
+        .tooltip {
+            position: absolute;
+            text-align: center;
+            width: auto;
+            height: auto;
+            padding: 8px;
+            font: 12px sans-serif;
+            background: lightsteelblue;
+            border: 0px;
+            border-radius: 8px;
+            pointer-events: none;
+            opacity: 0;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+            color: #333;
+        }
+        #legend {
+            margin-top: 20px;
+            padding: 10px;
+            background: #fff;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            display: inline-block;
+            font-size: 0.9em;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        footer {
+            margin-top: 50px;
+            padding: 20px;
+            font-size: 0.9em;
+            color: #777;
+            border-top: 1px solid #eee;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Unsupervised Learning for CAs: Client Segmentation</h1>
+    <p>
+        Explore how machines can find hidden patterns and groups within your client data, without you telling them what to look for!
+        This is a core concept of **Unsupervised Learning**.
+    </p>
+
+    <div class="container">
+        <div class="explanation-card">
+            <h3>The CA Analogy: Client Segmentation (Clustering)</h3>
+            <p>
+                Imagine you have a list of all your clients. For each client, you know their **Annual Turnover** (in Crores of ₹) and their **Number of Employees**.
+                Without predefined categories, the Clustering algorithm (Unsupervised Learning) finds the natural segments.
+            </p>
+            <p>
+                The machine groups clients based on the **similarity** of their data (how close they are on this chart), allowing for **data-driven insights**.
+            </p>
+        </div>
+
+        <h2>Interactive Visualization: Discover Client Clusters!</h2>
+        <p>Click anywhere on the graph below to add a new "client" (a data point). Click the button to generate a sample mix of clusters.</p>
+
+        <div class="controls">
+            <button id="addClusterBtn">Generate Mixed Client Sample</button>
+            <button id="resetBtn">Clear All Clients</button>
+        </div>
+
+        <div class="visualization-area">
+            <svg width="700" height="400"></svg>
+            <div id="legend"></div>
+            <div class="tooltip"></div>
+        </div>
+
+        <div class="explanation-card">
+            <h3>Unsupervised Learning: Why it Matters to CAs</h3>
+            <ul>
+                <li><strong>Risk Profiling:</strong> Automatically group clients or transactions with similar financial anomalies, flagging high-risk areas for deeper audit scrutiny without needing pre-set rules.</li>
+                <li><strong>Service Segmentation:</strong> Identify the true needs of different client groups. For example, one cluster might have high turnover but low employee count (requiring automated payroll/tax services), while another has low turnover but high expenses (requiring more detailed cost audit/advisory).</li>
+                <li><strong>Fraud Detection:</strong> Discovering groups of transactions that look *similar to each other* but are entirely *different* from the main, normal transaction patterns. This flags **outlier clusters** that traditional rule-based systems might miss.</li>
+                <li><strong>Optimizing Pricing:</strong> By clearly identifying the service needs and value profiles of different clusters, you can set fairer and more profitable pricing models for your consultancy services.</li>
+            </ul>
+        </div>
+        
+        <div class="explanation-card">
+            <h3>Application to Local LLMs: Using Unsupervised Learning for Foundation Models</h3>
+            <p>
+                When training a **Local Large Language Model (LLM)** for your CA practice, you need to understand how it processes data. This often involves Unsupervised Learning at a core level:
+            </p>
+            <ul>
+                <li><strong>Pre-training (The Core):</strong> The foundational LLM (like GPT) is built almost entirely using **Unsupervised Learning**. It reads massive amounts of text (financial reports, tax laws, legal documents) and learns the *relationships* between words and concepts without being explicitly labeled ("This is a liability," "This is a tax deduction"). It identifies **patterns** in language itself.</li>
+                <li><strong>Embedding/Vectorization:</strong> Unsupervised methods are used to turn complex documents (like IFRS standards or your client's contracts) into numerical **vectors** (embeddings). Documents that are conceptually similar—even if they use different words—will have their vectors clustered close together.</li>
+                <li>**RAG (Retrieval-Augmented Generation):** Before the LLM answers a query (e.g., "What is the capital gains tax on this asset?"), Unsupervised Clustering helps quickly find the most **relevant documents** (tax code sections, previous case files) from your local knowledge base by grouping similar document vectors. This ensures the LLM generates a precise, context-aware, and confidential answer based on your firm's private data.</li>
+            </ul>
+        </div>
+    </div>
+
+    <footer>
+        <p>Developed to explain AI/ML concepts to Chartered Accountants. © 2025</p>
+    </footer>
+
+    <script>
+        // D3.js Visualization Script
+        const margin = { top: 20, right: 30, bottom: 40, left: 50 };
+        const width = 700 - margin.left - margin.right;
+        const height = 400 - margin.top - margin.bottom;
+
+        const svg = d3.select("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", `translate(${margin.left},${margin.top})`);
+
+        let clients = [];
+        const colors = d3.scaleOrdinal(d3.schemeCategory10);
+        const clusterLabels = ['Small Business', 'Mid-Market', 'Enterprise'];
+        const clusterCounts = [0, 0, 0];
+
+        const xScale = d3.scaleLinear().domain([0, 100]).range([0, width]);
+        const yScale = d3.scaleLinear().domain([0, 100]).range([height, 0]);
+
+        // X-axis (Annual Turnover in Crores of ₹)
+        svg.append("g")
+            .attr("transform", `translate(0,${height})`)
+            .call(d3.axisBottom(xScale).ticks(10).tickFormat(d => `₹${d} Cr`))
+            .attr("class", "axis")
+            .append("text")
+            .attr("x", width / 2)
+            .attr("y", 35)
+            .attr("fill", "#666")
+            .attr("text-anchor", "middle")
+            .text("Annual Turnover (Crores ₹)");
+
+        // Y-axis (Number of Employees)
+        svg.append("g")
+            .call(d3.axisLeft(yScale).ticks(10))
+            .attr("class", "axis")
+            .append("text")
+            .attr("y", -30)
+            .attr("x", -height / 2)
+            .attr("fill", "#666")
+            .attr("text-anchor", "middle")
+            .attr("transform", "rotate(-90)")
+            .text("Number of Employees");
+
+        const tooltip = d3.select(".tooltip");
+        const legendContainer = d3.select("#legend");
+
+        function updateLegend() {
+            clusterCounts.fill(0);
+            clients.forEach(d => {
+                if (d.cluster !== undefined) {
+                    clusterCounts[d.cluster]++;
+                }
+            });
+
+            const legendData = clusterLabels.map((label, i) => ({
+                label: label,
+                color: colors(i),
+                count: clusterCounts[i]
+            }));
+
+            const legendItems = legendContainer.selectAll(".legend-item")
+                .data(legendData, d => d.label);
+
+            // Enter selection
+            const newItems = legendItems.enter().append("div")
+                .attr("class", "legend-item");
+
+            newItems.append("span")
+                .attr("class", "legend-color")
+                .style("background-color", d => d.color);
+
+            newItems.append("span")
+                .text(d => `${d.label} (${d.count} clients)`);
+
+            // Update selection
+            legendItems.select("span:last-child")
+                .text(d => `${d.label} (${d.count} clients)`);
+
+            // Exit selection
+            legendItems.exit().remove();
+        }
+
+        function updateVisualization() {
+            // Reset counts
+            clusterCounts.fill(0);
+
+            // Simple clustering logic (k-means-like, based on 3 fixed centroids)
+            if (clients.length > 0) {
+                // Centroids are now spread more widely
+                const centroids = [
+                    { x: 15, y: 15, name: clusterLabels[0] }, // Small businesses
+                    { x: 50, y: 50, name: clusterLabels[1] }, // Mid-Market
+                    { x: 85, y: 85, name: clusterLabels[2] }  // Enterprise
+                ];
+
+                clients.forEach(client => {
+                    let minDistance = Infinity;
+                    let clusterId = 0;
+                    centroids.forEach((centroid, i) => {
+                        const dist = Math.sqrt(
+                            Math.pow(client.revenue - centroid.x, 2) +
+                            Math.pow(client.employees - centroid.y, 2)
+                        );
+                        if (dist < minDistance) {
+                            minDistance = dist;
+                            clusterId = i;
+                        }
+                    });
+                    client.cluster = clusterId;
+                    clusterCounts[clusterId]++;
+                });
+            }
+
+            const dots = svg.selectAll(".dot")
+                .data(clients, d => d.id);
+
+            dots.enter().append("circle")
+                .attr("class", "dot")
+                .attr("cx", d => xScale(d.revenue))
+                .attr("cy", d => yScale(d.employees))
+                .attr("r", 5)
+                .style("fill", d => colors(d.cluster))
+                .on("mouseover", (event, d) => {
+                    tooltip.style("opacity", 1)
+                           .html(`Turnover: ₹${d.revenue} Cr<br/>Employees: ${d.employees}<br/>Cluster: ${clusterLabels[d.cluster]}`)
+                           .style("left", (event.pageX + 10) + "px")
+                           .style("top", (event.pageY - 28) + "px");
+                    d3.select(event.currentTarget).attr("r", 8);
+                })
+                .on("mouseout", (event, d) => {
+                    tooltip.style("opacity", 0);
+                    d3.select(event.currentTarget).attr("r", 5);
+                })
+                .merge(dots)
+                .transition()
+                .duration(500)
+                .style("fill", d => colors(d.cluster));
+
+            dots.exit().remove();
+
+            updateLegend();
+        }
+
+        svg.on("click", function(event) {
+            const [xCoord, yCoord] = d3.pointer(event);
+            // Ensure whole numbers
+            const revenue = Math.round(xScale.invert(xCoord));
+            const employees = Math.round(yScale.invert(yCoord));
+
+            if (revenue >= 0 && revenue <= 100 && employees >= 0 && employees <= 100) {
+                clients.push({
+                    id: clients.length,
+                    revenue: revenue,
+                    employees: employees,
+                    cluster: 0
+                });
+                updateVisualization();
+            }
+        });
+
+        d3.select("#addClusterBtn").on("click", function() {
+            // Generate a good mix of points across the graph
+            for (let i = 0; i < 25; i++) {
+                const clusterType = Math.floor(Math.random() * 3); // 0, 1, or 2
+                let baseRevenue, baseEmployees;
+                let spread = 15; // Increased spread for better cluster visualization
+
+                switch(clusterType) {
+                    case 0: // Small Business (Low Revenue/Employees)
+                        baseRevenue = 15;
+                        baseEmployees = 15;
+                        break;
+                    case 1: // Mid-Market (Mid Revenue/Employees)
+                        baseRevenue = 50;
+                        baseEmployees = 50;
+                        break;
+                    case 2: // Enterprise (High Revenue/Employees)
+                        baseRevenue = 85;
+                        baseEmployees = 85;
+                        break;
+                }
+
+                clients.push({
+                    id: clients.length,
+                    // Use Math.round() for whole numbers and spread the noise
+                    revenue: Math.max(1, Math.min(100, Math.round(baseRevenue + (Math.random() - 0.5) * spread * 2))), 
+                    employees: Math.max(1, Math.min(100, Math.round(baseEmployees + (Math.random() - 0.5) * spread * 2))),
+                    cluster: 0
+                });
+            }
+            updateVisualization();
+        });
+
+        d3.select("#resetBtn").on("click", function() {
+            clients = [];
+            updateVisualization();
+        });
+
+        // Initial render
+        updateVisualization();
+    </script>
+
+</body>
+</html>
