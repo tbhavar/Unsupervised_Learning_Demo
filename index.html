@@ -155,18 +155,18 @@
     <h1>Unsupervised Learning for CAs: Client Segmentation</h1>
     <p>
         Explore how machines can find hidden patterns and groups within your client data, without you telling them what to look for!
-        This is a core concept of Unsupervised Learning.
+        This is a core concept of **Unsupervised Learning**.
     </p>
 
     <div class="container">
         <div class="explanation-card">
             <h3>The CA Analogy: Client Segmentation (Clustering)</h3>
             <p>
-                Imagine you have a list of all your clients. For each client, you know their Annual Turnover (in Crores of ₹) and their Number of Employees.
+                Imagine you have a list of all your clients. For each client, you know their **Annual Turnover** (in Crores of ₹) and their **Number of Employees**.
                 Without predefined categories, the Clustering algorithm (Unsupervised Learning) finds the natural segments.
             </p>
             <p>
-                The machine groups clients based on the similarity of their data (how close they are on this chart), allowing for data-driven insights.
+                The machine groups clients based on the **similarity** of their data (how close they are on this chart), allowing for **data-driven insights**.
             </p>
         </div>
 
@@ -189,7 +189,7 @@
             <ul>
                 <li><strong>Risk Profiling:</strong> Automatically group clients or transactions with similar financial anomalies, flagging high-risk areas for deeper audit scrutiny without needing pre-set rules.</li>
                 <li><strong>Service Segmentation:</strong> Identify the true needs of different client groups. For example, one cluster might have high turnover but low employee count (requiring automated payroll/tax services), while another has low turnover but high expenses (requiring more detailed cost audit/advisory).</li>
-                <li><strong>Fraud Detection:</strong> Discovering groups of transactions that look similar to each other but are entirely different from the main, normal transaction patterns. This flags outlier clusters that traditional rule-based systems might miss.</li>
+                <li><strong>Fraud Detection:</strong> Discovering groups of transactions that look *similar to each other* but are entirely *different* from the main, normal transaction patterns. This flags **outlier clusters** that traditional rule-based systems might miss.</li>
                 <li><strong>Optimizing Pricing:</strong> By clearly identifying the service needs and value profiles of different clusters, you can set fairer and more profitable pricing models for your consultancy services.</li>
             </ul>
         </div>
@@ -197,12 +197,12 @@
         <div class="explanation-card">
             <h3>Application to Local LLMs: Using Unsupervised Learning for Foundation Models</h3>
             <p>
-                When training a Local Large Language Model (LLM) for your CA practice, you need to understand how it processes data. This often involves Unsupervised Learning at a core level:
+                When training a **Local Large Language Model (LLM)** for your CA practice, you need to understand how it processes data. This often involves Unsupervised Learning at a core level:
             </p>
             <ul>
-                <li><strong>Pre-training (The Core):</strong> The foundational LLM (like GPT) is built almost entirely using Unsupervised Learning. It reads massive amounts of text (financial reports, tax laws, legal documents) and learns the relationships between words and concepts without being explicitly labeled ("This is a liability," "This is a tax deduction"). It identifies patterns in language itself.</li>
-                <li><strong>Embedding/Vectorization:</strong> Unsupervised methods are used to turn complex documents (like IFRS standards or your client's contracts) into numerical vectors (embeddings). Documents that are conceptually similar—even if they use different words—will have their vectors clustered close together.</li>
-                <li>RAG (Retrieval-Augmented Generation): Before the LLM answers a query (e.g., "What is the capital gains tax on this asset?"), Unsupervised Clustering helps quickly find the most relevant documents (tax code sections, previous case files) from your local knowledge base by grouping similar document vectors. This ensures the LLM generates a precise, context-aware, and confidential answer based on your firm's private data.</li>
+                <li><strong>Pre-training (The Core):</strong> The foundational LLM (like GPT) is built almost entirely using **Unsupervised Learning**. It reads massive amounts of text (financial reports, tax laws, legal documents) and learns the *relationships* between words and concepts without being explicitly labeled ("This is a liability," "This is a tax deduction"). It identifies **patterns** in language itself.</li>
+                <li><strong>Embedding/Vectorization:</strong> Unsupervised methods are used to turn complex documents (like IFRS standards or your client's contracts) into numerical **vectors** (embeddings). Documents that are conceptually similar—even if they use different words—will have their vectors clustered close together.</li>
+                <li>**RAG (Retrieval-Augmented Generation):** Before the LLM answers a query (e.g., "What is the capital gains tax on this asset?"), Unsupervised Clustering helps quickly find the most **relevant documents** (tax code sections, previous case files) from your local knowledge base by grouping similar document vectors. This ensures the LLM generates a precise, context-aware, and confidential answer based on your firm's private data.</li>
             </ul>
         </div>
     </div>
@@ -375,7 +375,7 @@
         d3.select("#addClusterBtn").on("click", function() {
             // Generate a good mix of points across the graph
             for (let i = 0; i < 25; i++) {
-                const clusterType = Math.floor(Math.random()  3); // 0, 1, or 2
+                const clusterType = Math.floor(Math.random() * 3); // 0, 1, or 2
                 let baseRevenue, baseEmployees;
                 let spread = 15; // Increased spread for better cluster visualization
 
@@ -397,8 +397,8 @@
                 clients.push({
                     id: clients.length,
                     // Use Math.round() for whole numbers and spread the noise
-                    revenue: Math.max(1, Math.min(100, Math.round(baseRevenue + (Math.random() - 0.5)  spread  2))), 
-                    employees: Math.max(1, Math.min(100, Math.round(baseEmployees + (Math.random() - 0.5)  spread  2))),
+                    revenue: Math.max(1, Math.min(100, Math.round(baseRevenue + (Math.random() - 0.5) * spread * 2))), 
+                    employees: Math.max(1, Math.min(100, Math.round(baseEmployees + (Math.random() - 0.5) * spread * 2))),
                     cluster: 0
                 });
             }
@@ -417,4 +417,3 @@
 </body>
 
 </html>
-
